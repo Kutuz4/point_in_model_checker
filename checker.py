@@ -90,13 +90,16 @@ class Checker:
   
   def check(self, x, y, z):
     all = 0
+    mxon = 0
     coords = np.array([x, y, z, 1]).reshape(4, 1)
-    for i in range(100):
+    for i in range(1000):
       upperz, lowerz = 0, 0
       m, n, p = (random() - 0.5) * 20, (random() - 0.5) * 20, (random() - 0.5) * 20
       napr = np.array([m, n, p, 0]).reshape(4, 1)
       t = -1 * (np.matmul(self.eqs, coords))/(np.matmul(self.eqs, napr))
       t = t.reshape(-1)
+      is_on_plane = t[abs(t) == 0]
+      mxon = max(mxon, len(is_on_plane))
       coords0 = np.zeros((11, t.shape[0]))
       coords0[0] = x + m * t
       coords0[1] = y + n * t
@@ -118,6 +121,8 @@ class Checker:
       lowerz = np.sum(lows[:, 10])
       all += 1 - 2 * ((upperz % 2) == 0)
       all += 1 - 2 * ((lowerz % 2) == 0)
+    if abs(all) <= 6 and mxon > 0:
+      return True
     if all >= 0:
       return True
     return False
